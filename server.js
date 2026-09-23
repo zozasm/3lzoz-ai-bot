@@ -7,8 +7,8 @@ const VERIFY_TOKEN = "3izoz_verify_2026";
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
-// التحقق من Webhook
-app.get("/webhook", (req, res) => {
+// Webhook verification
+app.get("/webhook", function (req, res) {
     const mode = req.query["hub.mode"];
     const token = req.query["hub.verify_token"];
     const challenge = req.query["hub.challenge"];
@@ -21,35 +21,42 @@ app.get("/webhook", (req, res) => {
     res.sendStatus(403);
 });
 
-// استقبال رسائل واتساب والرد عليها
-app.post("/webhook", async (req, res) => {
+// استقبال رسائل واتساب
+app.post("/webhook", async function (req, res) {
     console.log("WhatsApp Webhook received:");
     console.log(JSON.stringify(req.body, null, 2));
 
     try {
-        const message =
-            req.body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+        var message = null;
+
+        if (
+            req.body &&
+            req.body.entry &&
+            req.body.entry[0] &&
+            req.body.entry[0].changes &&
+            req.body.entry[0].changes[0] &&
+            req.body.entry[0].changes[0].value &&
+            req.body.entry[0].changes[0].value.messages
+        ) {
+            message = req.body.entry[0].changes[0].value.messages[0];
+        }
 
         if (!message) {
             return res.sendStatus(200);
         }
 
-        const from = message.from;
-
         if (message.type !== "text") {
             return res.sendStatus(200);
         }
 
-        const userMessage = message.text.body;
-
-        console.log("Message:", userMessage);
+        const from = message.from;
 
         const response = await fetch(
-            `https://graph.facebook.com/v23.0/${PHONE_NUMBER_ID}/messages`,
+            "https://graph.facebook.com/v23.0/" + PHONE_NUMBER_ID + "/messages",
             {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${WHATSAPP_TOKEN}`,
+                    "Authorization": "Bearer " + WHATSAPP_TOKEN,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
@@ -57,7 +64,7 @@ app.post("/webhook", async (req, res) => {
                     to: from,
                     type: "text",
                     text: {
-                        body: "مرحبا بيك انا بوت 3LZOZ حاليا3LZOZ م فاضي شويه وهيرد عليك\ي"
+                        body: "مرحبًا بيك 👋 أنا بوت 3lzoz 🤖 حاليًا 3lzoz مش فاضي شوية، وهيرد عليك أول ما يفضى."
                     }
                 })
             }
@@ -65,11 +72,11 @@ app.post("/webhook", async (req, res) => {
 
         const result = await response.json();
 
-        console.log("WhatsApp API response:");
+        console.log("WhatsApp response:");
         console.log(JSON.stringify(result, null, 2));
 
     } catch (error) {
-        console.error("Error:", error);
+        console.log("Error:", error);
     }
 
     res.sendStatus(200);
@@ -77,6 +84,6 @@ app.post("/webhook", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`3izoz AI Bot running on port ${PORT}`);
+app.listen(PORT, "0.0.0.0", function () {
+    console.log("3lzoz AI Bot running on port " + PORT);
 });
