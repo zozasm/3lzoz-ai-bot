@@ -1,13 +1,10 @@
 const express = require("express");
-
 const app = express();
 
 app.use(express.json());
 
-// بيانات مؤقتة للـ Webhook
 const VERIFY_TOKEN = "3izoz_verify_2026";
 
-// اختبار الـ Webhook من Meta
 app.get("/webhook", (req, res) => {
     const mode = req.query["hub.mode"];
     const token = req.query["hub.verify_token"];
@@ -21,7 +18,6 @@ app.get("/webhook", (req, res) => {
     res.sendStatus(403);
 });
 
-// استقبال رسائل واتساب
 app.post("/webhook", (req, res) => {
     console.log("WhatsApp Webhook received:");
     console.log(JSON.stringify(req.body, null, 2));
