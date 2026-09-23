@@ -3,7 +3,7 @@ const app = express();
 
 app.use(express.json());
 
-const VERIFY_TOKEN = "3izoz_verify_2026";
+const VERIFY_TOKEN = "3lzoz_verify_2026";
 
 app.get("/webhook", (req, res) => {
     const mode = req.query["hub.mode"];
