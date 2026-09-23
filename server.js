@@ -29,8 +29,8 @@ app.post("/webhook", (req, res) => {
     res.sendStatus(200);
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`3izoz AI Bot running on port ${PORT}`);
 });
